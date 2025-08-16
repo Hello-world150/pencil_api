@@ -18,7 +18,7 @@ fn random_hitokoto(
 ) -> Json<Result<Hitokoto, ErrorMessage>> {
     let mut rng = rng.lock().unwrap();
     let data_lock = data.lock().unwrap();
-    match get_random_hitokoto(&*data_lock, &mut *rng) {
+    match get_random_hitokoto(&data_lock, &mut *rng) {
         Some(hitokoto) => Json(Ok(hitokoto)),
         None => Json(Err(ErrorMessage("No hitokoto found"))),
     }

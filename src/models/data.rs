@@ -53,7 +53,7 @@ fn _try_open_file_with_default(path: &str, default_json: &str) -> File {
             let metadata = file.metadata().expect("Failed to get file metadata");
             if metadata.len() == 0 {
                 file.write_all(default_json.as_bytes())
-                    .expect(&format!("Failed to write default JSON to {}", path));
+                    .unwrap_or_else(|_| panic!("Failed to write default JSON to {}", path));
                 file.flush().expect("Failed to flush file");
             }
 
@@ -64,23 +64,23 @@ fn _try_open_file_with_default(path: &str, default_json: &str) -> File {
             file
         }
         Err(_) => {
-            let mut file = File::create(path).expect(&format!("Failed to create {}", path));
+            let mut file = File::create(path).unwrap_or_else(|_| panic!("Failed to create {}", path));
 
             // Write default JSON content
             file.write_all(default_json.as_bytes())
-                .expect(&format!("Failed to write default JSON to {}", path));
+                .unwrap_or_else(|_| panic!("Failed to write default JSON to {}", path));
 
             // Ensure the file is flushed
             file.flush().expect("Failed to flush file");
 
             // Reopen the file for reading and writing
-            let file = OpenOptions::new()
+            
+
+            OpenOptions::new()
                 .read(true)
                 .write(true)
                 .open(path)
-                .expect(&format!("Failed to open {}", path));
-
-            file
+                .unwrap_or_else(|_| panic!("Failed to open {}", path))
         }
     }
 }
@@ -93,8 +93,8 @@ where
     let mut file = _try_open_file_with_default(path, "[]");
     let mut content = String::new();
     file.read_to_string(&mut content)
-        .expect(&format!("Failed to read {}", path));
-    serde_json::from_str(&content).expect(&format!("Failed to parse {}", path))
+        .unwrap_or_else(|_| panic!("Failed to read {}", path));
+    serde_json::from_str(&content).unwrap_or_else(|_| panic!("Failed to parse {}", path))
 }
 
 // Load all hitokoto records from hitokoto.json

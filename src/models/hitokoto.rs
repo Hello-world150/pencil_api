@@ -30,12 +30,12 @@ impl Hitokoto {
             .as_secs();
 
         Hitokoto {
-            id: id,
+            id,
             content: new_hitokoto.content,
             from: new_hitokoto.from,
             from_who: new_hitokoto.from_who,
             user_id: new_hitokoto.user_id,
-            created_at: created_at,
+            created_at,
         }
     }
 }

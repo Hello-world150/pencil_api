@@ -26,10 +26,10 @@ impl User {
         // Generate new vector for hitokoto ids
         let hitokotos = Vec::new();
         User {
-            id: id,
+            id,
             email: new_user.email,
             password: hashed_password,
-            hitokotos: hitokotos,
+            hitokotos,
         }
     }
 
