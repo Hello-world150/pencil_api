@@ -4,15 +4,16 @@ use serde_json;
 use std::fs::{File, OpenOptions};
 use std::io::{Read, Seek, SeekFrom, Write};
 
+use super::collection::Collection;
 use super::hitokoto::Hitokoto;
 use super::user::User;
 
 // This struct holds all the data loaded from files: hitokotos, users, and collections.
 #[derive(Serialize, Deserialize)]
 pub struct Data {
-    pub hitokotos: Vec<Hitokoto>, // All hitokoto records
-    pub users: Vec<User>,         // All user records
-    pub collections: Vec<String>, // All collection records
+    pub hitokotos: Vec<Hitokoto>,     // All hitokoto records
+    pub users: Vec<User>,             // All user records
+    pub collections: Vec<Collection>, // All collection records
 }
 
 pub enum DataType {
@@ -21,11 +22,22 @@ pub enum DataType {
     Collection,
 }
 impl Data {
-    // Add hitokoto to data and save to file
-    // TODO: Generic type support
-    pub fn add(&mut self, hitokoto: Hitokoto) {
+    /// Add hitokoto to data and save to file
+    pub fn add_hitokoto(&mut self, hitokoto: Hitokoto) {
         self.hitokotos.push(hitokoto);
         self._save(DataType::Hitokoto);
+    }
+
+    /// Add user to data and save to file
+    pub fn add_user(&mut self, user: User) {
+        self.users.push(user);
+        self._save(DataType::User);
+    }
+
+    /// Add collection to data save to file
+    pub fn add_collection(&mut self, collection: Collection) {
+        self.collections.push(collection);
+        self._save(DataType::User);
     }
 
     fn _save(&mut self, data_type: DataType) {
@@ -64,7 +76,8 @@ fn _try_open_file_with_default(path: &str, default_json: &str) -> File {
             file
         }
         Err(_) => {
-            let mut file = File::create(path).unwrap_or_else(|_| panic!("Failed to create {}", path));
+            let mut file =
+                File::create(path).unwrap_or_else(|_| panic!("Failed to create {}", path));
 
             // Write default JSON content
             file.write_all(default_json.as_bytes())
@@ -74,7 +87,6 @@ fn _try_open_file_with_default(path: &str, default_json: &str) -> File {
             file.flush().expect("Failed to flush file");
 
             // Reopen the file for reading and writing
-            
 
             OpenOptions::new()
                 .read(true)
@@ -84,6 +96,7 @@ fn _try_open_file_with_default(path: &str, default_json: &str) -> File {
         }
     }
 }
+
 // Read and parse a JSON file into a Vec<T>.
 // If the file does not exist or is empty, it will be created with an empty array.
 fn _load_json_vec<T>(path: &str) -> Vec<T>
@@ -108,8 +121,8 @@ fn _load_user_data() -> Vec<User> {
 }
 
 // Load all collection records from collection.json
-fn _load_collection_data() -> Vec<String> {
-    _load_json_vec::<String>("collection.json")
+fn _load_collection_data() -> Vec<Collection> {
+    _load_json_vec::<Collection>("collection.json")
 }
 // Load all data (hitokotos, users, collections) and return as a Data struct
 pub fn load_data() -> Data {

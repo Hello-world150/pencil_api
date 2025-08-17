@@ -9,6 +9,8 @@ pub struct User {
     email: String,
     /// The hashed password of the user.
     password: String,
+    /// The collection vector of the user.
+    collections: Vec<u64>,
     /// The hitokoto id vector of the user,
     /// be used to query the hitokotos that this user owned.
     hitokotos: Vec<u64>,
@@ -23,12 +25,14 @@ impl User {
         // Generate bcrypt hashed password with cost 10
         let hashed_password = bcrypt::hash(new_user.raw_password, 10).unwrap();
 
-        // Generate new vector for hitokoto ids
+        // Generate two new vector for hitokoto and collection ids
         let hitokotos = Vec::new();
+        let collections = Vec::new();
         User {
             id,
             email: new_user.email,
             password: hashed_password,
+            collections,
             hitokotos,
         }
     }
