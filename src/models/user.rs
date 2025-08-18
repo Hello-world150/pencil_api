@@ -1,7 +1,7 @@
 use bcrypt::BcryptResult;
 use rocket::serde::{Deserialize, Serialize};
 /// The struct defination of the users.
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct User {
     /// The user id of the user.
     id: u64,

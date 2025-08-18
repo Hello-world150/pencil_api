@@ -1,16 +1,18 @@
 #[macro_use]
 extern crate rocket;
 
+use pencil_api::models::user::User;
 use rand::SeedableRng;
 use rand::rngs::StdRng;
 use rocket::State;
 use rocket::serde::json::Json;
 use std::sync::Mutex;
 
-use pencil_api::models::anthology::Anthology;
+use pencil_api::models::anthology::*;
 use pencil_api::models::data::Data;
 use pencil_api::models::error::ErrorMessage;
 use pencil_api::models::hitokoto::*;
+use pencil_api::models::user::*;
 
 /// Get a random hitokoto
 // TODO: query parameters support
@@ -51,7 +53,7 @@ fn create_hitokoto(
 /// Add a new anthology
 #[post("/anthology", data = "<new_anthology_json>")]
 fn create_anthlogy(
-    new_anthology_json: Json<Anthology>,
+    new_anthology_json: Json<NewAnthology>,
     data: &State<Mutex<Data>>,
 ) -> Result<Json<Anthology>, Json<ErrorMessage>> {
     let new_anthology = new_anthology_json.into_inner();
@@ -65,12 +67,36 @@ fn create_anthlogy(
         Err(_) => Err(Json(ErrorMessage("Server Error"))),
     }
 }
+
+/// Add a new user
+#[post("/user", data = "<new_user_json>")]
+fn create_user(
+    new_user_json: Json<NewUser>,
+    data: &State<Mutex<Data>>,
+) -> Result<Json<User>, Json<ErrorMessage>> {
+    let new_user = new_user_json.into_inner();
+    let user = User::from(new_user);
+
+    match data.lock() {
+        Ok(mut data_lock) => {
+            data_lock.users.push(user.clone());
+            Ok(Json(user))
+        }
+        Err(_) => Err(Json(ErrorMessage("Server Error"))),
+    }
+}
+
 #[launch]
 fn rocket() -> _ {
     let data = Mutex::new(pencil_api::models::data::load_data());
     let rng = Mutex::new(StdRng::seed_from_u64(0)); // Seed the RNG
     rocket::build().manage(data).manage(rng).mount(
         "/",
-        routes![random_hitokoto, create_hitokoto, create_anthlogy],
+        routes![
+            random_hitokoto,
+            create_hitokoto,
+            create_anthlogy,
+            create_user
+        ],
     )
 }
