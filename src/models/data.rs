@@ -4,22 +4,22 @@ use serde_json;
 use std::fs::{File, OpenOptions};
 use std::io::{Read, Seek, SeekFrom, Write};
 
-use super::collection::Collection;
+use super::anthology::Anthology;
 use super::hitokoto::Hitokoto;
 use super::user::User;
 
-// This struct holds all the data loaded from files: hitokotos, users, and collections.
+// This struct holds all the data loaded from files: hitokotos, users, and anthlogies.
 #[derive(Serialize, Deserialize)]
 pub struct Data {
-    pub hitokotos: Vec<Hitokoto>,     // All hitokoto records
-    pub users: Vec<User>,             // All user records
-    pub collections: Vec<Collection>, // All collection records
+    pub hitokotos: Vec<Hitokoto>,    // All hitokoto records
+    pub users: Vec<User>,            // All user records
+    pub anthologies: Vec<Anthology>, // All anthology records
 }
 
 pub enum DataType {
     Hitokoto,
     User,
-    Collection,
+    Anthology,
 }
 impl Data {
     /// Add hitokoto to data and save to file
@@ -34,9 +34,9 @@ impl Data {
         self._save(DataType::User);
     }
 
-    /// Add collection to data save to file
-    pub fn add_collection(&mut self, collection: Collection) {
-        self.collections.push(collection);
+    /// Add anthology to data save to file
+    pub fn add_anthology(&mut self, anthology: Anthology) {
+        self.anthologies.push(anthology);
         self._save(DataType::User);
     }
 
@@ -48,8 +48,8 @@ impl Data {
             DataType::User => {
                 // TODO: Implement user saving
             }
-            DataType::Collection => {
-                // TODO: Implement collection saving
+            DataType::Anthology => {
+                // TODO: Implement anthology saving
             }
         }
     }
@@ -120,18 +120,18 @@ fn _load_user_data() -> Vec<User> {
     _load_json_vec::<User>("user.json")
 }
 
-// Load all collection records from collection.json
-fn _load_collection_data() -> Vec<Collection> {
-    _load_json_vec::<Collection>("collection.json")
+// Load all anthology records from anthology.json
+fn _load_anthology_data() -> Vec<Anthology> {
+    _load_json_vec::<Anthology>("anthology.json")
 }
-// Load all data (hitokotos, users, collections) and return as a Data struct
+// Load all data (hitokotos, users, anthology) and return as a Data struct
 pub fn load_data() -> Data {
     let hitokotos = _load_hitokoto_data();
     let users = _load_user_data();
-    let collections = _load_collection_data();
+    let anthologies = _load_anthology_data();
     Data {
         hitokotos,
         users,
-        collections,
+        anthologies,
     }
 }
