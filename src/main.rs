@@ -89,7 +89,7 @@ fn create_user(
 #[launch]
 fn rocket() -> _ {
     let data = Mutex::new(pencil_api::models::data::load_data());
-    let rng = Mutex::new(StdRng::seed_from_u64(0)); // Seed the RNG
+    let rng = Mutex::new(StdRng::from_os_rng()); // Seed the RNG
     rocket::build().manage(data).manage(rng).mount(
         "/",
         routes![
