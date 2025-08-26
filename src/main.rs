@@ -20,12 +20,12 @@ use pencil_api::models::user::*;
 fn random_hitokoto(
     data: &State<Mutex<Data>>,
     rng: &State<Mutex<StdRng>>,
-) -> Json<Result<Hitokoto, ErrorMessage>> {
+) -> Result<Json<Hitokoto>, Json<ErrorMessage>> {
     let mut rng = rng.lock().unwrap();
     let data_lock = data.lock().unwrap();
     match get_random_hitokoto(&data_lock, &mut *rng) {
-        Some(hitokoto) => Json(Ok(hitokoto)),
-        None => Json(Err(ErrorMessage("No hitokoto found"))),
+        Some(hitokoto) => Ok(Json(hitokoto)),
+        None => Err(Json(ErrorMessage("No hitokoto found"))),
     }
 }
 
