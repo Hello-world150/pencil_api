@@ -6,6 +6,8 @@ use rocket::serde::{Deserialize, Serialize};
 pub struct Hitokoto {
     /// The id of the hitokoto.
     id: i64,
+    /// The optional title of the hitokoto.
+    title: Option<String>,
     /// The content of the hitokoto.
     content: String,
     /// The source of the hitokoto, author or book etc.
@@ -31,6 +33,7 @@ impl Hitokoto {
 
         Hitokoto {
             id,
+            title: new_hitokoto.title,
             content: new_hitokoto.content,
             from: new_hitokoto.from,
             from_who: new_hitokoto.from_who,
@@ -44,6 +47,7 @@ impl Hitokoto {
 /// This struct has no `id`.
 #[derive(Deserialize)]
 pub struct NewHitokoto {
+    pub title: Option<String>,
     pub content: String,
     pub from: String,
     pub from_who: Option<String>,
